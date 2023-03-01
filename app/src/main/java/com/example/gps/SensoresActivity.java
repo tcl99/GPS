@@ -7,15 +7,23 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import java.util.List;
 
-public class sensoresActivity extends AppCompatActivity implements SensorEventListener {
+public class SensoresActivity extends AppCompatActivity implements SensorEventListener {
 
+    private TextView textX;
+    private TextView textY;
+    private TextView textZ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensores_acitivity);
+
+        textX = findViewById(R.id.textX);
+        textY = findViewById(R.id.textY);
+        textZ = findViewById(R.id.textZ);
 
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         List<Sensor> listaSensores = sensorManager.getSensorList(Sensor.TYPE_ALL);
@@ -37,9 +45,9 @@ public class sensoresActivity extends AppCompatActivity implements SensorEventLi
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        System.out.println("hola");
-       // System.out.println(event.values[SensorManager.DATA_Y]);
-        //System.out.println(event.values[SensorManager.DATA_Z]);
+        textX.setText(""+event.values[SensorManager.DATA_X]);
+        textY.setText(""+event.values[SensorManager.DATA_Y]);
+        textZ.setText(""+event.values[SensorManager.DATA_Z]);
     }
 
 }

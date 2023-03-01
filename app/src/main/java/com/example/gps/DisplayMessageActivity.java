@@ -3,12 +3,8 @@ package com.example.gps;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.hardware.lights.Light;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,7 +37,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
     }
 
     public void sensoresButton (View view) {
-        Intent intent = new Intent(this, sensoresActivity.class);
+        Intent intent = new Intent(this, SensoresActivity.class);
         startActivity(intent);
     }
 }
