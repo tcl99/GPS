@@ -37,23 +37,10 @@
         android:layout_marginTop="24dp"
         android:onClick="misRutasButton"
         android:text="Mis Rutas"
+        app:layout_constraintBottom_toTopOf="@+id/sensoresButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imagePerfil" />
-
-    <Button
-        android:id="@+id/oofButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:onClick="oofButton"
-        android:text="oof"
-        app:layout_constraintBottom_toTopOf="@+id/sensoresButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/routesButton"
-        app:layout_constraintVertical_bias="0.004" />
 
     <Button
         android:id="@+id/sensoresButton"

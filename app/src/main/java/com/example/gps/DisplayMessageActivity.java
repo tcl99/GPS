@@ -39,10 +39,6 @@ public class DisplayMessageActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RoutesActivity.class);
         startActivity(intent);
     }
-    public void oofButton (View view) {
-        Intent intent = new Intent(this, oofActivity.class);
-        startActivity(intent);
-    }
 
     public void sensoresButton (View view) {
         Intent intent = new Intent(this, sensoresActivity.class);

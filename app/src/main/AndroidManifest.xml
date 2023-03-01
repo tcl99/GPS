@@ -21,9 +21,6 @@
             android:name=".sensoresActivity"
             android:exported="false" />
         <activity
-            android:name=".oofActivity"
-            android:exported="false" />
-        <activity
             android:name=".RoutesActivity"
             android:exported="false" />
         <activity
