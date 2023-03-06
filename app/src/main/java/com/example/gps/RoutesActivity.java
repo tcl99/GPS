@@ -1,14 +1,22 @@
 package com.example.gps;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.location.LocationListenerCompat;
 
+import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class RoutesActivity extends AppCompatActivity {
+public class RoutesActivity extends AppCompatActivity implements LocationListener {
 
     private ListView routesView;
     private ArrayList<String> routes;
@@ -17,6 +25,8 @@ public class RoutesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes);
+
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         routesView = (ListView) findViewById(R.id.routes);
         routes = new ArrayList<String>();
@@ -42,5 +52,31 @@ public class RoutesActivity extends AppCompatActivity {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, routes);
         routesView.setAdapter(adapter);
+
+        routesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent;
+                String opcion = routes.get(i);
+
+                intent = new Intent(RoutesActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            //tvLongitud.setText(location.getLongitude() + "");
+            //vLatitud.setText(location.getLatitude() + "");
+        }
+    }
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+    }
+    @Override
+    public void onProviderEnabled(String s) {
+    }
+    @Override
+    public void onProviderDisabled(String s) {
     }
 }
