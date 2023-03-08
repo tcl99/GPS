@@ -12,12 +12,16 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class RoutesActivity extends AppCompatActivity implements LocationListener {
 
+    public static final String EXTRA_MSG = "com.example.gps.MESSAGE";
     private ListView routesView;
     private ArrayList<String> routes;
 
@@ -27,6 +31,21 @@ public class RoutesActivity extends AppCompatActivity implements LocationListene
         setContentView(R.layout.activity_routes);
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        Intent intent = getIntent();
+        String msg = intent.getStringExtra(MainActivity.EXTRA_MSG);
+
+        TextView textView = findViewById(R.id.welcomeMsg);
+        ImageView imageView = findViewById(R.id.imgPerfil);
+
+        if(msg.isEmpty()) {
+            textView.setText("BUENAS, PERSONA MISTERIOSA ");
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable._55_5553299_incognito_logo_hd_png_download, null));
+        }
+        else {
+            textView.setText("BUENAS, " + msg);
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable.prismo, null));
+        }
 
         routesView = (ListView) findViewById(R.id.routes);
         routes = new ArrayList<String>();
@@ -60,6 +79,8 @@ public class RoutesActivity extends AppCompatActivity implements LocationListene
                 String opcion = routes.get(i);
 
                 intent = new Intent(RoutesActivity.this, MapActivity.class);
+                String msg = routes.get(i).toString();
+                intent.putExtra(EXTRA_MSG, msg);
                 startActivity(intent);
             }
         });

@@ -18,6 +18,9 @@
         android:theme="@style/Theme.GPS"
         tools:targetApi="31">
         <activity
+            android:name=".GoingRoute"
+            android:exported="false" />
+        <activity
             android:name=".MapActivity"
             android:exported="false" />
         <activity
@@ -38,6 +41,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDIbjDBQaq3TlkiszrQ6sbSibz7MUy815I" />
     </application>
 
 </manifest>
