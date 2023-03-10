@@ -17,9 +17,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.sql.Time;
 import java.util.ArrayList;
 
-public class RoutesActivity extends AppCompatActivity implements LocationListener {
+public class RoutesActivity extends AppCompatActivity {
 
     public static final String EXTRA_MSG = "com.example.gps.MESSAGE";
     private ListView routesView;
@@ -29,8 +30,6 @@ public class RoutesActivity extends AppCompatActivity implements LocationListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes);
-
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         Intent intent = getIntent();
         String msg = intent.getStringExtra(MainActivity.EXTRA_MSG);
@@ -82,22 +81,9 @@ public class RoutesActivity extends AppCompatActivity implements LocationListene
                 String msg = routes.get(i).toString();
                 intent.putExtra(EXTRA_MSG, msg);
                 startActivity(intent);
+
             }
         });
     }
-    public void onLocationChanged(Location location) {
-        if (location != null) {
-            //tvLongitud.setText(location.getLongitude() + "");
-            //vLatitud.setText(location.getLatitude() + "");
-        }
-    }
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-    }
-    @Override
-    public void onProviderEnabled(String s) {
-    }
-    @Override
-    public void onProviderDisabled(String s) {
-    }
+
 }
