@@ -48,7 +48,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         TextView nombreRuta = findViewById(R.id.nombreRuta);
         nombreRuta.setText(msg);
 
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
@@ -69,12 +68,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.getCurrentLocation(LocationManager.GPS_PROVIDER, null, getApplication().getMainExecutor(), new Consumer<Location>() {
-            @Override
-            public void accept(Location location) {
-                googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
-            }
-        });
         LatLng ini = new LatLng(43.127556,  -4.795145);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(ini));
         googleMap.setMyLocationEnabled(true);
