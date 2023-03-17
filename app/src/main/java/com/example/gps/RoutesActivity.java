@@ -37,14 +37,9 @@ public class RoutesActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.welcomeMsg);
         ImageView imageView = findViewById(R.id.imgPerfil);
 
-        if(msg.isEmpty()) {
-            textView.setText("BUENAS, PERSONA MISTERIOSA ");
-            imageView.setImageDrawable(getResources().getDrawable(R.drawable._55_5553299_incognito_logo_hd_png_download, null));
-        }
-        else {
-            textView.setText("BUENAS, " + msg);
-            imageView.setImageDrawable(getResources().getDrawable(R.drawable.prismo, null));
-        }
+        textView.setText("BUENAS, " + msg);
+        imageView.setImageDrawable(getResources().getDrawable(R.drawable.prismo, null));
+
 
         routesView = (ListView) findViewById(R.id.routes);
         routes = new ArrayList<String>();

@@ -36,13 +36,14 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class GoingRoute extends AppCompatActivity implements SensorEventListener, LocationListener, OnMapReadyCallback {
+public class GoingRoute  extends AppCompatActivity implements SensorEventListener, LocationListener, OnMapReadyCallback {
 
     private Chronometer simpleChronometer;
     private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Runtime runtime = Runtime.getRuntime();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_going_route);
@@ -75,6 +76,15 @@ public class GoingRoute extends AppCompatActivity implements SensorEventListener
         simpleChronometer.setBase(SystemClock.elapsedRealtime());
         simpleChronometer.start();
         simpleChronometer.setFormat("Tiempo de ruta\n%s");
+
+        TextView mem = findViewById(R.id.memory);
+
+        simpleChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                mem.setText(""+runtime.totalMemory()+" "+runtime.freeMemory());
+            }
+        });
     }
 
     @Override
@@ -122,7 +132,7 @@ public class GoingRoute extends AppCompatActivity implements SensorEventListener
     }
 
     public void pararRutaButton(View view) {
-
+        this.onBackPressed();
     }
 
     @Override
