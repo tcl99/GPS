@@ -38,8 +38,14 @@ import java.util.function.Consumer;
 
 public class GoingRoute  extends AppCompatActivity implements SensorEventListener, LocationListener, OnMapReadyCallback {
 
+    private final float THRESHOLD = 4f; // Umbral de detección de caídas
+    private boolean fallen = false; // Indica si se ha detectado una caída previamente
+
     private Chronometer simpleChronometer;
     private LocationManager locationManager;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private Sensor gyroscope;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +62,7 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
         mapFragment.getMapAsync(this);
 
         //SENSORES
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         List<Sensor> listaSensores = sensorManager.getSensorList(Sensor.TYPE_ALL);
         for (Sensor sensor : listaSensores) {
             System.out.println(sensor.getName());
@@ -66,9 +72,9 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
         if (acelerometter != null) {
             sensorManager.registerListener((SensorEventListener) this, acelerometter, SensorManager.SENSOR_DELAY_UI);
         }
-        Sensor gyro = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        if (gyro != null) {
-            sensorManager.registerListener((SensorEventListener) this, gyro, SensorManager.SENSOR_DELAY_UI);
+        Sensor gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        if (gyroscope != null) {
+            sensorManager.registerListener((SensorEventListener) this, gyroscope, SensorManager.SENSOR_DELAY_UI);
         }
 
         //TIEMPO DE LA RUTA CON CRONOMETRO
@@ -85,6 +91,21 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
                 mem.setText(""+runtime.totalMemory()+" "+runtime.freeMemory());
             }
         });
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Registrar el listener de sensores
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Detener la lectura de sensores
+        sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -94,8 +115,33 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        //Toast.makeText(this, "Heyhey", Toast.LENGTH_SHORT).show();
-    }
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            // Calcular la aceleración total
+            float acceleration = (float) Math.sqrt(x * x + y * y + z * z);
+
+            if (acceleration < THRESHOLD && !fallen) {
+                // Si se ha superado el umbral y no se ha detectado una caída previamente
+                fallen = true;
+                Toast.makeText(this, "Se ha detectado una posible caída", Toast.LENGTH_SHORT).show();
+            }
+        } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            // Calcular la velocidad angular total
+            float angularSpeed = (float) Math.sqrt(x * x + y * y + z * z);
+
+            if (angularSpeed > THRESHOLD && fallen) {
+                // Si se ha superado el umbral y se había detectado una caída previamente
+                fallen = false;
+                Toast.makeText(this, "La caída ha sido detenida", Toast.LENGTH_SHORT).show();
+            }
+        }    }
 
     public void onLocationChanged(Location location) {
         if (location != null) {
@@ -137,6 +183,7 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        googleMap.moveCamera(CameraUpdateFactory.zoomTo(10f));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -147,11 +194,11 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.getCurrentLocation(LocationManager.GPS_PROVIDER, null, getApplication().getMainExecutor(), new Consumer<Location>() {
-            @Override
-            public void accept(Location location) {
-                googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
-            }
-        });
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        LatLng ini = new LatLng(location.getLatitude(),  location.getLongitude());
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ini));
+
+        googleMap.setMyLocationEnabled(true);
     }
 }
