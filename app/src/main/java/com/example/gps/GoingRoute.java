@@ -1,8 +1,13 @@
 package com.example.gps;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Observer;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.database.Observable;
 import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,6 +18,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
+import android.view.View;
+import android.widget.Chronometer;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class GoingRoute extends AppCompatActivity implements SensorEventListener, LocationListener {
 
     private long start_t;
+    Chronometer simpleChronometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +40,6 @@ public class GoingRoute extends AppCompatActivity implements SensorEventListener
         setContentView(R.layout.activity_going_route);
 
         start_t = System.nanoTime();
-
-        TextView tiempo = findViewById(R.id.tiempoTranscurrido);
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -51,10 +58,10 @@ public class GoingRoute extends AppCompatActivity implements SensorEventListener
             sensorManager.registerListener((SensorEventListener) this, gyro, SensorManager.SENSOR_DELAY_UI);
         }
 
-        //locatiion talll
-
-        //Periodico actualiza tiempo
-
+        //Cronometro
+        simpleChronometer = (Chronometer) findViewById(R.id.simpleChronometer);
+        simpleChronometer.start();
+        simpleChronometer.setFormat("Tiempo de ruta - %s");
 
     }
 
@@ -85,11 +92,9 @@ public class GoingRoute extends AppCompatActivity implements SensorEventListener
 
     @Override
     public void onBackPressed() {
-
-
-        Toast.makeText(this, "Tiempo Ruta: "+
-                TimeUnit.SECONDS.convert(System.nanoTime()-start_t,TimeUnit.NANOSECONDS),
-                Toast.LENGTH_SHORT).show();
+        simpleChronometer.stop();
+        Toast.makeText(this, "Tiempo de Ruta: ", Toast.LENGTH_SHORT).show();
         this.finish();
     }
+
 }

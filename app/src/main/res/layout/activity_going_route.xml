@@ -7,22 +7,12 @@
     android:background="#6FEA8E"
     tools:context=".GoingRoute">
 
-    <TextView
-        android:id="@+id/tiempoTranscurrido"
+    <Chronometer
+        android:id="@+id/simpleChronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:textAlignment="center"
         android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mapView2" />
-
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView2"
-        android:layout_width="0dp"
-        android:layout_height="350dp"
+        app:layout_constraintBottom_toTopOf="@+id/pararRutaButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,10 +21,9 @@
         android:id="@+id/pararRutaButton"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tiempoTranscurrido" />
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

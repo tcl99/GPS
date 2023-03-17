@@ -1,29 +1,45 @@
 package com.example.gps;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+import java.util.function.Consumer;
 
-    private MapView mapView;
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
+
+    private GoogleMap googleMap;
+    private LocationManager locationManager;
+    private float latitude;
+    private float longitude;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView3);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         Intent intent = getIntent();
@@ -32,21 +48,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         TextView nombreRuta = findViewById(R.id.nombreRuta);
         nombreRuta.setText(msg);
 
-        mapView = findViewById(R.id.mapView3);
 
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
         }
 
-        mapView.getMapAsync(this);
-        mapView.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        googleMap.moveCamera(CameraUpdateFactory.zoomTo(9f));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.getCurrentLocation(LocationManager.GPS_PROVIDER, null, getApplication().getMainExecutor(), new Consumer<Location>() {
+            @Override
+            public void accept(Location location) {
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
+            }
+        });
+        LatLng ini = new LatLng(43.127556,  -4.795145);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ini));
+        googleMap.setMyLocationEnabled(true);
 
     }
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        //AIzaSyDIbjDBQaq3TlkiszrQ6sbSibz7MUy815I
-        //googleMap.addMarker(new MarkerOptions().position(new LatLng(43.127456,-4.795184)).title("Éxito"));
+    public void onLocationChanged(@NonNull Location location) {
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
     }
     @Override
     public void onBackPressed() {
@@ -62,5 +98,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void empezarRutaButton(View view) {
         Intent intent = new Intent(this, GoingRoute.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+    }
+    @Override
+    public void onProviderEnabled(String s) {
+    }
+    @Override
+    public void onProviderDisabled(String s) {
     }
 }
