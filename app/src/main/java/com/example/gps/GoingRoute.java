@@ -1,12 +1,14 @@
 package com.example.gps;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Observable;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,6 +24,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.view.View;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +41,7 @@ import java.util.function.Consumer;
 
 public class GoingRoute  extends AppCompatActivity implements SensorEventListener, LocationListener, OnMapReadyCallback {
 
-    private final float THRESHOLD = 4f; // Umbral de detección de caídas
+    private final float THRESHOLD = 6f; // Umbral de detección de caídas
     private boolean fallen = false; // Indica si se ha detectado una caída previamente
 
     private Chronometer simpleChronometer;
@@ -53,6 +56,8 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_going_route);
+
+        getSupportActionBar().hide();
 
         //LOCALIZACION
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -93,9 +98,17 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
         });
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        this.fallen=false;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        this.fallen = false;
         // Registrar el listener de sensores
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
@@ -126,22 +139,12 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
             if (acceleration < THRESHOLD && !fallen) {
                 // Si se ha superado el umbral y no se ha detectado una caída previamente
                 fallen = true;
-                Toast.makeText(this, "Se ha detectado una posible caída", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Se ha detectado una posible caída", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, CaidaActivity.class);
+                startActivity(intent);
             }
-        } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
-
-            // Calcular la velocidad angular total
-            float angularSpeed = (float) Math.sqrt(x * x + y * y + z * z);
-
-            if (angularSpeed > THRESHOLD && fallen) {
-                // Si se ha superado el umbral y se había detectado una caída previamente
-                fallen = false;
-                Toast.makeText(this, "La caída ha sido detenida", Toast.LENGTH_SHORT).show();
-            }
-        }    }
+        } //else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {}
+    }
 
     public void onLocationChanged(Location location) {
         if (location != null) {

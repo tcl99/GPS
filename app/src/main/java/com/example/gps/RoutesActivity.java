@@ -31,6 +31,8 @@ public class RoutesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes);
 
+        getSupportActionBar().hide();
+
         Intent intent = getIntent();
         String msg = intent.getStringExtra(MainActivity.EXTRA_MSG);
 
