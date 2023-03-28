@@ -54,6 +54,7 @@ public class CaidaActivity extends AppCompatActivity {
                 }
                 countdown.setTextSize(48);
                 countdown.setText("¡Ayuda en camino!");
+
             }
         }.start();
 
