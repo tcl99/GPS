@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MSG = "com.example.gps.MESSAGE";
     private TextView user;
     private TextView pass;
+    private boolean hasUserChanged;
+    private boolean hasPassChanged;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -30,10 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
         user = findViewById(R.id.editUsername);
         pass = findViewById(R.id.editPassword);
+        hasUserChanged = false;
+        hasPassChanged = false;
 
         user.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                hasUserChanged = true;
                 user.setText("");
                 user.setTextColor(Color.parseColor("#FF000000"));
                 user.setOnTouchListener(null);
@@ -43,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         pass.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                hasPassChanged = true;
                 pass.setText("");
                 pass.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 pass.setTextColor(Color.parseColor("#FF000000"));
@@ -54,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage (View view) {
-        if(user.getText().toString().isEmpty() || pass.getText().toString().isEmpty()) {
+        if(user.getText().toString().isEmpty() || pass.getText().toString().isEmpty() || !hasUserChanged || !hasPassChanged) {
             Toast.makeText(this, "No puedes dejar campos vacios", Toast.LENGTH_SHORT).show();
         }
         else {

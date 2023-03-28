@@ -47,6 +47,12 @@ public class RoutesActivity extends AppCompatActivity {
         routes = new ArrayList<String>();
         routes.add("Reinosa-Potes");
         routes.add("Reinosa-Vega de Pas");
+        routes.add("Vuelta a Campoo de suso");
+        routes.add("Vuelta a Campoo de yuso");
+        routes.add("Vuelta a Campoo de enmedio");
+        routes.add("Puerto del escudo");
+        routes.add("Piedrasluengas");
+        routes.add("Valderredible");
         routes.add("Soto-Cabezón de la sal");
         routes.add("Costa");
         routes.add("Picos de Europa");
@@ -54,16 +60,9 @@ public class RoutesActivity extends AppCompatActivity {
         routes.add("Reinosa-Orbaneja del castillo(Burgos)");
         routes.add("Fuente Dé-Riaño(León)");
         routes.add("Camino Lebaniego");
-        routes.add("oof1");
-        routes.add("oof2");
-        routes.add("oof3");
-        routes.add("oof4");
-        routes.add("oof5");
-        routes.add("oof6");
-        routes.add("oof7");
-        routes.add("oof8");
-        routes.add("oof9");
-        routes.add("oof");
+        routes.add("Ruta del asón");
+
+        routes.sort(String::compareToIgnoreCase);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, routes);
         routesView.setAdapter(adapter);

@@ -22,6 +22,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
 import android.widget.EditText;
@@ -42,7 +43,8 @@ import java.util.function.Consumer;
 public class GoingRoute  extends AppCompatActivity implements SensorEventListener, LocationListener, OnMapReadyCallback {
 
     private final float THRESHOLD = 6f; // Umbral de detección de caídas
-    private boolean fallen = false; // Indica si se ha detectado una caída previamente
+    private boolean fallen = false; // Indica si se ha detectado una caída previamente, sirve para no iniciar mas de 1 activity de caida a la vez
+    private GoogleMap googleMap;
 
     private Chronometer simpleChronometer;
     private LocationManager locationManager;
@@ -89,6 +91,13 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
         simpleChronometer.setFormat("Tiempo de ruta\n%s");
 
         TextView mem = findViewById(R.id.memory);
+        //mem.setText();
+        /*
+
+        //FRAGMENTO DE CÓDIGO PARA VER LA MEMORIA CONSUMIDA, A VECES LA ACTIVITY SE PARA SIN MÁS
+
+        TextView mem = findViewById(R.id.memory);
+
 
         simpleChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             @Override
@@ -97,7 +106,33 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
             }
         });
 
+         */
+
     }
+
+    //METODOS MAPA
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(10f));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        LatLng ini = new LatLng(location.getLatitude(),  location.getLongitude());
+        this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(ini));
+        this.googleMap.setMyLocationEnabled(true);
+    }
+
+    //METODOS ACTIVITY
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -110,16 +145,25 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
         super.onResume();
         this.fallen = false;
         // Registrar el listener de sensores
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+        Sensor acelerometter = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (acelerometter != null) {
+            sensorManager.registerListener((SensorEventListener) this, acelerometter, SensorManager.SENSOR_DELAY_UI);
+        }
+        Sensor gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        if (gyroscope != null) {
+            sensorManager.registerListener((SensorEventListener) this, gyroscope, SensorManager.SENSOR_DELAY_UI);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        //this.fallen = false;
         // Detener la lectura de sensores
         sensorManager.unregisterListener(this);
     }
+
+    //METODOS SENSORES
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int precision) {
@@ -137,7 +181,7 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
             float acceleration = (float) Math.sqrt(x * x + y * y + z * z);
 
             if (acceleration < THRESHOLD && !fallen) {
-                // Si se ha superado el umbral y no se ha detectado una caída previamente
+                //Si se ha superado el umbral y no se ha detectado una caída previamente
                 fallen = true;
                 //Toast.makeText(this, "Se ha detectado una posible caída", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, CaidaActivity.class);
@@ -148,8 +192,8 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
 
     public void onLocationChanged(Location location) {
         if (location != null) {
-            //tvLongitud.setText(location.getLongitude() + "");
-            //vLatitud.setText(location.getLatitude() + "");
+            LatLng ini = new LatLng(location.getLatitude(),  location.getLongitude());
+            this.googleMap.moveCamera(CameraUpdateFactory.newLatLng(ini));
         }
     }
 
@@ -164,6 +208,8 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
     @Override
     public void onProviderDisabled(String s) {
     }
+
+    //METODOS BOTONES
 
     @Override
     public void onBackPressed() {
@@ -182,26 +228,5 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
 
     public void pararRutaButton(View view) {
         this.onBackPressed();
-    }
-
-    @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        googleMap.moveCamera(CameraUpdateFactory.zoomTo(10f));
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        LatLng ini = new LatLng(location.getLatitude(),  location.getLongitude());
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(ini));
-
-        googleMap.setMyLocationEnabled(true);
     }
 }
