@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "584453011711",
+    "project_id": "electric-unity-359112",
+    "storage_bucket": "electric-unity-359112.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584453011711:android:11e0de05814b6ce48ab4ca",
+        "android_client_info": {
+          "package_name": "com.example.gps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "584453011711-c04u9v3hhi1jt905k0n4slo9ip4v5bpo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdka1poj7zcVrqNaPNkuuOvD6qPHfaqrw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "584453011711-c04u9v3hhi1jt905k0n4slo9ip4v5bpo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,23 +1,26 @@
 package com.example.gps;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.location.LocationListenerCompat;
 
-import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.sql.Time;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 public class RoutesActivity extends AppCompatActivity {
@@ -30,16 +33,49 @@ public class RoutesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes);
-
         getSupportActionBar().hide();
 
         Intent intent = getIntent();
-        String msg = intent.getStringExtra(MainActivity.EXTRA_MSG);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference ref = db.getReference("usuarios");
+        ref.child(user.getUid()).child("guia");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean esGuia = snapshot.getValue(Boolean.class);
+                if(esGuia) Toast.makeText(RoutesActivity.this, "SoY GUIA", Toast.LENGTH_SHORT).show();
+                else Toast.makeText(RoutesActivity.this, "NOPE", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(RoutesActivity.this, "lol", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+        if (user != null) {
+            // Name, email address, and profile photo Url
+            String email = user.getEmail();
+
+            // Check if user's email is verified
+            boolean emailVerified = user.isEmailVerified();
+
+            // The user's ID, unique to the Firebase project. Do NOT use this value to
+            // authenticate with your backend server, if you have one. Use
+            // FirebaseUser.getIdToken() instead.
+            String uid = user.getUid();
+        }
 
         TextView textView = findViewById(R.id.welcomeMsg);
         ImageView imageView = findViewById(R.id.imgPerfil);
 
-        textView.setText("BUENAS, " + msg);
+        String msg = intent.getStringExtra(LoginActivity.EXTRA_MSG);
+
+        textView.setText("BUENAS, " + user.getEmail());
         imageView.setImageDrawable(getResources().getDrawable(R.drawable.prismo, null));
 
 

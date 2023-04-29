@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#6FEA8E"
     tools:context=".GoingRoute">
 
     <Chronometer
@@ -13,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:textSize="24sp"
+        android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/pararRutaButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

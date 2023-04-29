@@ -2,8 +2,11 @@ package com.example.gps;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
@@ -17,8 +20,12 @@ import java.util.Properties;
 
 public class CaidaActivity extends AppCompatActivity {
 
+    Vibrator vibrator;
+    CountDownTimer countDownTimer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_caida);
 
@@ -26,10 +33,14 @@ public class CaidaActivity extends AppCompatActivity {
 
         TextView countdown = findViewById(R.id.countdownView);
 
-        new CountDownTimer(30000, 1000) {
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+
+        countDownTimer = new CountDownTimer(30000, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 countdown.setText(""+millisUntilFinished / 1000);
+                vibrator.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.EFFECT_TICK));
             }
 
             public void onFinish() {
@@ -45,7 +56,7 @@ public class CaidaActivity extends AppCompatActivity {
                     inputStream.close();
 
                     SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(telefono, null, "El remitente de este teléfono se ha caido y no se puede levantar" , null, null);
+                    smsManager.sendTextMessage(telefono, null, "El remitente de este teléfono se ha caido y no se puede levantar", null, null);
                     Toast.makeText(CaidaActivity.this, "¡SMS Enviado!", Toast.LENGTH_SHORT).show();
 
                 } catch (Exception e) {
@@ -65,6 +76,8 @@ public class CaidaActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        vibrator.cancel();
+        countDownTimer.cancel();
         this.finish();
     }
 }

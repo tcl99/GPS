@@ -144,7 +144,7 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
     protected void onResume() {
         super.onResume();
         this.fallen = false;
-        // Registrar el listener de sensores
+        // Registrar el listener de sensores otra vez
         Sensor acelerometter = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (acelerometter != null) {
             sensorManager.registerListener((SensorEventListener) this, acelerometter, SensorManager.SENSOR_DELAY_UI);
@@ -183,7 +183,6 @@ public class GoingRoute  extends AppCompatActivity implements SensorEventListene
             if (acceleration < THRESHOLD && !fallen) {
                 //Si se ha superado el umbral y no se ha detectado una caída previamente
                 fallen = true;
-                //Toast.makeText(this, "Se ha detectado una posible caída", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, CaidaActivity.class);
                 startActivity(intent);
             }

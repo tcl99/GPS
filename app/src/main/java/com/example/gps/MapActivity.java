@@ -15,15 +15,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-
-import java.util.function.Consumer;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
@@ -45,7 +41,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         Intent intent = getIntent();
-        String msg = intent.getStringExtra(MainActivity.EXTRA_MSG);
+        String msg = intent.getStringExtra(LoginActivity.EXTRA_MSG);
 
         TextView nombreRuta = findViewById(R.id.nombreRuta);
         nombreRuta.setText(msg);
