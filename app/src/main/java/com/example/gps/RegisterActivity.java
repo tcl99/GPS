@@ -24,10 +24,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class RegisterActivity extends AppCompatActivity {
+    public static final String EXTRA_MSG = "com.example.gps.MESSAGE";
 
     private EditText correo;
     private EditText password;
@@ -79,8 +77,6 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     public void registrarseButton (View  view) {
@@ -100,18 +96,28 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        //Se añade el rol a la base de datos
-                        FirebaseDatabase db = FirebaseDatabase.getInstance();
-                        DatabaseReference ref = db.getReference("usuarios");
+                        //Se añade su nombre y rol a la BBDD
+                        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance("https://electric-unity-359112-default-rtdb.europe-west1.firebasedatabase.app/");
+                        DatabaseReference myRef = mDatabase.getReference("basegpst/usuarios");
 
-                        String UID = task.getResult().getUser().getUid();
-                        Map<String, Object> datosUsuario = new HashMap<>();
-                        datosUsuario.put("guia", guia.isChecked());
+                        FirebaseUser user = task.getResult().getUser();
 
-                        ref.child(UID).setValue(datosUsuario);
+                        String nombre = user.getEmail().substring(0,user.getEmail().indexOf("@"));
 
-                        Intent intent = new Intent(RegisterActivity.this, RoutesActivity.class);
+                        myRef.child(user.getUid()).child("nombre").setValue(nombre);
+                        myRef.child(task.getResult().getUser().getUid()).child("guia").setValue(guia.isChecked());
+
+                        Intent intent;
+                        if(guia.isChecked()) {
+                            //Actividad guia
+                            intent = new Intent(RegisterActivity.this, GuiaActivity.class);
+                        }
+                        else {
+                            //Actividad rutas
+                            intent = new Intent(RegisterActivity.this, RoutesActivity.class);
+                        }
                         startActivity(intent);
+
                     } else {
                         try {
 

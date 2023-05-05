@@ -24,7 +24,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:textAlignment="center"
-        android:textColor="#604E33"
+        android:textColor="#FFFFFF"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,23 +46,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Mis Rutas"
-            android:textColor="#604E33"
+            android:textColor="#FFFFFF"
             android:textSize="34sp"
             android:textStyle="bold" />
 
-        <FrameLayout
+        <ListView
+            android:id="@+id/routes"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="49dp">
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="32dp"
+            android:cacheColorHint="#FFFFFF"
+            android:clickable="true"
+            android:outlineAmbientShadowColor="#FFFFFF"
+            android:outlineSpotShadowColor="#FFFFFF" />
 
-            <ListView
-                android:id="@+id/routes"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="1dp"
-                android:layout_marginEnd="1dp"
-                android:layout_marginBottom="32dp"
-                android:clickable="true" />
-        </FrameLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

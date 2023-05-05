@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.AuthResult;
@@ -26,17 +28,25 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.concurrent.CountDownLatch;
 
 public class LoginActivity extends AppCompatActivity {
     public static final String EXTRA_MSG = "com.example.gps.MESSAGE";
-
-    private FirebaseAuth aut;
     private TextView user;
     private TextView pass;
-    private boolean hasUserChanged;
-    private boolean hasPassChanged;
-    private Chip guia;
-    private Chip senderista;
+
+    private Usuario u;
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference myRef;
+    private AuthResult resultadoLogin;
+    private FirebaseAuth aut;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -45,97 +55,38 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-        //Autenticación
+        //Por si hubiera problemas
+        FirebaseAuth.getInstance().signOut();
+
+        //Para iniciar sesion
         aut = FirebaseAuth.getInstance();
 
         //Carga de las vistas
-        guia = findViewById(R.id.guia);
-        senderista = findViewById(R.id.senderista);
         user = findViewById(R.id.editUsername);
         pass = findViewById(R.id.editPassword);
 
-        //Inicialización de los valores para los listeners
-        hasUserChanged = false;
-        hasPassChanged = false;
-        senderista.setChecked(false);
-        guia.setChecked(false);
-
-        //LISTENERS PARA MARCAR SOLO UNA OPCIÓN A LA VEZ
-        senderista.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(senderista.isChecked()) {
-                    if (guia.isChecked()) {
-                        guia.setChecked(false);
-                    }
-                }
-            }
-        });
-
-        guia.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(guia.isChecked()) {
-                    if (senderista.isChecked()) {
-                        senderista.setChecked(false);
-                    }
-                }
-            }
-        });
-
-        //LISTENERS PARA GESTIONAR USUARIO Y CONTRASEÑA
-        user.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                hasUserChanged = true;
-                user.setText("");
-                user.setTextColor(Color.parseColor("#FF000000"));
-                user.setOnTouchListener(null);
-                return false;
-            }
-        });
-        pass.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                hasPassChanged = true;
-                pass.setText("");
-                pass.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                pass.setTextColor(Color.parseColor("#FF000000"));
-                pass.setOnTouchListener(null);
-                return false;
-            }
-        });
-
+        //Inicia la bbdd
+        mDatabase = FirebaseDatabase.getInstance("https://electric-unity-359112-default-rtdb.europe-west1.firebasedatabase.app/");
+        myRef = mDatabase.getReference("basegpst/usuarios");
 
 
     }
 
-    public void iniciarSesionButton (View view) {
+    public void iniciarSesionButton(View view) {
         //LOGEARSE CON EMAIL Y CONTRASEÑA
         //Primero se compueba que los campos se rellenen
-        if(user.getText().toString().isEmpty() || pass.getText().toString().isEmpty() || !hasUserChanged || !hasPassChanged) {
+        if (user.getText().toString().isEmpty() || pass.getText().toString().isEmpty()) {
             Toast.makeText(this, "No puedes dejar campos vacios", Toast.LENGTH_SHORT).show();
-        }
-        else if ( !senderista.isChecked() && !guia.isChecked() ) {
-            Toast.makeText(this, "Escoge un rol", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             aut.signInWithEmailAndPassword(user.getText().toString(), pass.getText().toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     //SE CONSIGUE AUTENTICAR
                     if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "signInWithEmail:success");
-                        FirebaseUser user = aut.getCurrentUser();
+                        resultadoLogin = task.getResult();
+                        getUsuarioFromFirebase(resultadoLogin);
 
-                        Intent intent = new Intent(LoginActivity.this, RoutesActivity.class);
-                        EditText editText = (EditText) findViewById(R.id.editUsername);
-                        String msg = editText.getText().toString();
-                        intent.putExtra(EXTRA_MSG, msg);
-                        startActivity(intent);
-
-                    //FALLA LA AUTENTICACIÓN
+                        //FALLA LA AUTENTICACIÓN
                     } else {
                         try {
                             throw task.getException();
@@ -158,4 +109,29 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
         startActivity(intent);
     }
+
+    public void getUsuarioFromFirebase(AuthResult authResult) {
+        myRef.child(authResult.getUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                DataSnapshot snapshot = task.getResult();
+                Usuario u = snapshot.getValue(Usuario.class);
+                if (task.isSuccessful()) {
+                    Intent intent;
+                    if(u.isGuia()) {
+                        intent = new Intent(LoginActivity.this, GuiaActivity.class);
+                    }
+                    else {
+                        intent = new Intent(LoginActivity.this, RoutesActivity.class);
+                    }
+                    EditText editText = (EditText) findViewById(R.id.editUsername);
+                    startActivity(intent);
+
+                } else {
+                    Log.d("Firebase", "error");
+                }
+            }
+        });
+    }
 }
+
